@@ -3,16 +3,24 @@
 
 #include <mpi.h>
 #include <stdio.h>
+#include <pthread.h>
+#include <semaphore.h>
 
 //Typy
 
 typedef std::pair<int, int> timestamp;
 
-enum stan {
-    LOT,
-    POSTOJ,
-    START,
-    OTHER
+enum State {
+    UNINTERESTED,
+    INTERESTED,
+    BUSY
+};
+
+enum Message {
+    REQ_START,
+    REQ_HANGAR,
+    REL_START,
+    REL_HANGAR
 };
 
 //Stałe
@@ -43,5 +51,19 @@ void rel_hangar();
 void init(int argc, char **argv);
 void finalize();
 
-#endif	// DEF_H
+//Send an Recv wrap
+void send(int receiver, Message msg, timestamp ts);
+void sendAll(Message msg, timestamp ts);
+void recv(int* sender, Message* msg, timestamp* ts);
+
+//Monitor thread
+void* monitor(void* arg);
+
+//Monitor actions
+void on_req_hangar();
+void on_req_start();
+void on_rel_hangar();
+void on_rel_start();
+
+#endif // DEF_H
 

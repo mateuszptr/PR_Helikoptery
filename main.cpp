@@ -1,9 +1,11 @@
 #include "def.h"
 
 timestamp ts;
+State state_hangar;
+State state_start;
 
-int RD_H[H];
-int RD_S[H];
+int RD_H[H]={0};
+int RD_S[H]={0};
 
 int rank, size;
 char processor_name[MPI_MAX_PROCESSOR_NAME];
@@ -49,6 +51,11 @@ void init(int argc, char **argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Get_processor_name(processor_name, &namelen);
+    
+    ts = timestamp(0, rank);
+    state_hangar = UNINTERESTED;
+    state_start = UNINTERESTED;
+    
 }
 
 void finalize() {

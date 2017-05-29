@@ -60,10 +60,10 @@ void recv(int* sender, Message* msg, timestamp* ts);
 void* monitor(void* arg);
 
 //Monitor actions
-void on_req_hangar();
-void on_req_start();
-void on_rel_hangar();
-void on_rel_start();
+void on_req_hangar(int receiver, Message msg, timestamp ts_i);
+void on_req_start(int receiver, Message msg, timestamp ts_i);
+void on_rel_hangar(int receiver, Message msg, timestamp ts_i);
+void on_rel_start(int receiver, Message msg, timestamp ts_i);
 
 #endif // DEF_H
 

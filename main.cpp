@@ -1,6 +1,6 @@
 #include "def.h"
 
-timestamp ts;
+timestamp ts, ts_r;
 State state_hangar;
 State state_start;
 
@@ -10,6 +10,8 @@ int RD_S[H]={0};
 int rank, size;
 char processor_name[MPI_MAX_PROCESSOR_NAME];
 int namelen;
+
+bool finished;
 
 int main(int argc, char **argv) {
 
@@ -56,9 +58,45 @@ void init(int argc, char **argv) {
     state_hangar = UNINTERESTED;
     state_start = UNINTERESTED;
     
+    finished = false;
+    
 }
 
 void finalize() {
     printf("h%d: Kończę!\n", rank);
     MPI_Finalize();
+}
+
+void req_hangar() {
+    ts_r = ts;
+    sendAll(REQ_HANGAR, ts_r);
+    //recv_h
+    //wait
+}
+
+void req_start() {
+    ts_r = ts;
+    sendAll(REQ_START, ts_r);
+    //recv_s
+    //wait
+}
+
+void rel_hangar() {
+    state_hangar = UNINTERESTED;
+    for(int i=0;i<H;i++) {
+        if(RD_H[i]==1) {
+            send(i, REL_HANGAR, ts);
+            RD_H[i]=0;
+        }
+    }
+}
+
+void rel_start() {
+    state_start = UNINTERESTED;
+    for(int i=0;i<H;i++) {
+        if(RD_S[i]==1) {
+            send(i, REL_START, ts);
+            RD_S[i]=0;
+        }
+    }
 }

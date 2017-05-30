@@ -49,6 +49,7 @@ void rel_hangar();
 
 //MPI wrap
 void init(int argc, char **argv);
+void init_mutex();
 void finalize();
 
 //Send an Recv wrap

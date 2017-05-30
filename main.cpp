@@ -11,6 +11,10 @@ pthread_mutex_t mutex_ts_r;
 pthread_mutex_t mutex_rd_h;
 pthread_mutex_t mutex_rd_s;
 
+sem_t sem_hangar;
+sem_t sem_start;
+
+
 pthread_mutexattr_t mutex_state_hangar_attr;
 pthread_mutexattr_t mutex_state_start_attr;
 pthread_mutexattr_t mutex_ts_attr;
@@ -103,6 +107,9 @@ void init_mutex() {
     
     pthread_mutexattr_init(&mutex_rd_s_attr);
     pthread_mutex_init(&mutex_rd_s, &mutex_rd_s_attr);
+    
+    sem_init(&sem_hangar, 0, 0);
+    sem_init(&sem_start, 0, 0);
 
 }
 
@@ -116,10 +123,16 @@ void finalize() {
     pthread_mutex_destroy(&mutex_ts_r);
     pthread_mutex_destroy(&mutex_rd_h);
     pthread_mutex_destroy(&mutex_rd_s);
+    
+    sem_destroy(&sem_hangar);
+    sem_destroy(&sem_start);
 }
 
 void req_hangar() {
 
+    pthread_mutex_lock(&mutex_state_hangar);
+    state_hangar = INTERESTED;
+    pthread_mutex_unlock(&mutex_state_hangar);
     
     pthread_mutex_lock(&mutex_ts);
     pthread_mutex_lock(&mutex_ts_r);
@@ -129,11 +142,19 @@ void req_hangar() {
     
     pthread_mutex_unlock(&mutex_ts_r);
     pthread_mutex_unlock(&mutex_ts);
-    //recv_h
-    //wait
+    
+    sem_wait(&sem_hangar);
+    
+    pthread_mutex_lock(&mutex_state_hangar);
+    state_hangar = BUSY;
+    pthread_mutex_unlock(&mutex_state_hangar);
 }
 
 void req_start() {
+    
+    pthread_mutex_lock(&mutex_state_start);
+    state_start = INTERESTED;
+    pthread_mutex_unlock(&mutex_state_start);
     
     pthread_mutex_lock(&mutex_ts);
     pthread_mutex_lock(&mutex_ts_r);
@@ -144,8 +165,11 @@ void req_start() {
     pthread_mutex_unlock(&mutex_ts_r);
     pthread_mutex_unlock(&mutex_ts);
 
-    //recv_s
-    //wait
+    sem_wait(&sem_start);
+    
+    pthread_mutex_lock(&mutex_state_start);
+    state_start = BUSY;
+    pthread_mutex_unlock(&mutex_state_start);
 }
 
 void rel_hangar() {

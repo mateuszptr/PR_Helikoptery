@@ -23,6 +23,11 @@ enum Message {
     REL_HANGAR
 };
 
+typedef struct msg_s {
+	int msg;
+	timestamp ts;
+} msg_s;
+
 //Stałe
 
 const int H = 10;

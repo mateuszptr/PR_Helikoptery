@@ -8,7 +8,32 @@
 
 //Typy
 
-typedef std::pair<int, int> timestamp;
+class timestamp {
+public:
+    int first;
+    int second;
+    
+    timestamp(){
+        
+    }
+
+    timestamp(int i, int j) {
+        first=i;
+        second=j;
+    }
+    
+    bool operator>(timestamp t) {
+        if(this->first > t.first) return true;
+        if(this->first == t.first && this->second > t.second) return true;
+        return false;
+    }
+    
+    bool operator<(timestamp t) {
+        if(this->first < t.first) return true;
+        if(this->first == t.first && this->second < t.second) return true;
+        return false;
+    }
+};
 
 enum State {
     UNINTERESTED,
@@ -23,12 +48,19 @@ enum Message {
     REL_HANGAR
 };
 
+typedef struct msg_s {
+    int rank;
+    int msg;
+    int ts_1;
+    int ts_2;
+} msg_s;
+
 //Stałe
 
 const int H = 10;
-const int P = 8;
+const int P = 5;
 const int S = 4;
-const int IT = 1;
+const int IT = 100;
 
 //Czynności
 
@@ -50,12 +82,13 @@ void rel_hangar();
 //MPI wrap
 void init(int argc, char **argv);
 void init_mutex();
+void init_struct();
 void finalize();
 
 //Send an Recv wrap
 void send(int receiver, Message msg, timestamp ts);
 void sendAll(Message msg, timestamp ts);
-void recv(int* sender, Message* msg, timestamp* ts);
+msg_s recv();
 
 //Monitor thread
 void* monitor(void* arg);
